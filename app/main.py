@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+from pathlib import Path
+
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -12,6 +15,9 @@ from app.routers import clients, kyc, payments, pilot_leads, signatures, uploads
 
 settings = get_settings()
 setup_logging()
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+LANDING_PAGE = BASE_DIR / "verifiq-landing (1).html"
 
 # En dev con SQLite creamos las tablas directo. En producción (Postgres) el
 # esquema se gestiona SOLO vía Alembic — ver alembic/versions/.
@@ -43,6 +49,16 @@ app.include_router(payments.router)
 app.include_router(pilot_leads.router)
 
 app.mount("/panel", StaticFiles(directory="app/static", html=True), name="panel")
+
+
+@app.get("/", include_in_schema=False)
+def landing():
+    return FileResponse(LANDING_PAGE, media_type="text/html; charset=utf-8")
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return Response(status_code=204)
 
 
 @app.get("/health")

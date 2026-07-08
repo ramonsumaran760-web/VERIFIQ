@@ -806,9 +806,9 @@ curl -X POST https://api.verifiq.pe/signatures/sign \<br>
   const form = document.getElementById('pilotForm');
   const submitBtn = document.getElementById('submitBtn');
   const formError = document.getElementById('formError');
-  // Backend real de VerifiQ. Cambia esto por tu dominio de producción una vez
-  // que despliegues la API (ver README del backend).
-  const API_BASE_URL = 'http://localhost:8000';
+  const API_BASE_URL = window.location.protocol === 'file:'
+    ? 'http://localhost:8000'
+    : window.location.origin;
 
   form.addEventListener('submit', async function(e){
     e.preventDefault();
