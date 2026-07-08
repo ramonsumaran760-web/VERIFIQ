@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: verifiq
+      POSTGRES_USER: verifiq
+      POSTGRES_PASSWORD: verifiq_local_only
+    ports:
+      - "5432:5432"
+    volumes:
+      - verifiq_pg_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://verifiq:verifiq_local_only@db:5432/verifiq
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  verifiq_pg_data:
